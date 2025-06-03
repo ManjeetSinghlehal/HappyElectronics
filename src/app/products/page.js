@@ -7,6 +7,7 @@ export default async function ProductsPage() {
 
   return (
     <main>
+      {/* Hero Section */}
       <section className="bg-primary text-white text-center py-5">
         <div className="container">
           <h1 className="display-4 fw-bold text-white">Our Products</h1>
@@ -46,6 +47,40 @@ export default async function ProductsPage() {
               <option value="priceHigh">Price: High to Low</option>
             </select>
           </div>
+        </div>
+
+        {/* Products Grid */}
+        <div className="row g-4">
+          {products && products.length > 0 ? (
+            products.map((product) => (
+              <div className="col-sm-6 col-md-4" key={product.id}>
+                <div className="card h-100 shadow-sm">
+                  <Image
+                    src={product.imageUrl}
+                    alt={product.name}
+                    width={300}
+                    height={200}
+                    className="card-img-top object-fit-cover"
+                  />
+                  <div className="card-body d-flex flex-column">
+                    <h5 className="card-title">{product.name}</h5>
+                    <p className="card-text">${product.price}</p>
+                    <p className="card-text fw-semibold text-muted fst-italic">
+                      {product.category}
+                    </p>
+                    <Link
+                      href={`/products/${product.id}`}
+                      className="btn btn-outline-primary mt-auto"
+                    >
+                      View Product
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="text-center">No products found.</p>
+          )}
         </div>
       </section>
     </main>
