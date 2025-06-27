@@ -1,15 +1,16 @@
 import mongoose from "mongoose";
 
-const providerSchema = new mongoose.Schema({
-  name: String,
-  userId: Number,
-});
-
 const userSchema = new mongoose.Schema({
+  id: { type: Number, required: true },
   name: { type: String, required: true },
-  providers: [providerSchema],
+  providers: [{
+    _id: false,
+    userId: { type: Number, required: true },
+    name: { type: String, required: true }
+  }],
   email: { type: String, unique: true, required: true },
-  imageUrl: String,
+  password: { type: String },
+  imageUrl: { type: String },
   isVerified: { type: Boolean, default: false },
 });
 
