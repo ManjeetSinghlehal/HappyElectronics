@@ -34,7 +34,27 @@ export const authOptions = {
       return token;
     },
   },
-  providers: []
+  providers: [
+    CredentialsProvider({
+      name: "Credentials",
+      credentials: {
+        email: { label: "Email", type: "text" },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials) {
+        const { email, password } = credentials;
+        console.log(email, password);
+        
+        const user = await login(email, password); // adapt this
+        console.log(user);
+        
+        if (user.success) {
+          return user.user; // must be a plain object
+        }
+        return null;
+      },
+    }),
+  ]
 };
 
 const handler = NextAuth(authOptions);
