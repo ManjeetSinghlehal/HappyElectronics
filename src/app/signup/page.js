@@ -1,4 +1,49 @@
+"use client";
+
+import Link from "next/link";
+import { useState, useTransition } from "react";
+import { signIn } from "next-auth/react";
+import signUp from "../actions/signUp";
+
 export default function SignupPage() {
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [isPending, startTransition] = useTransition();
+
+  const handleChange = (e) =>
+    setForm({ ...form, [e.target.name]: e.target.value });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (form.password !== form.confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
+    const data = new FormData();
+    data.append("name", form.name);
+    data.append("email", form.email);
+    data.append("password", form.password);
+
+    startTransition(async () => {
+      const result = await signUp(data);
+      if (typeof result === "string") {
+        setError(result);
+        setSuccess("");
+      } else if (result?.success) {
+        setError("");
+        setSuccess(result.message);
+      }
+    });
+  };
+
   return (
     <main className="bg-gray-100 min-h-screen flex items-center justify-center py-10 px-4">
       <div className="w-full max-w-lg bg-white p-6 rounded shadow">
@@ -6,14 +51,21 @@ export default function SignupPage() {
           Create Your Account
         </h2>
 
+        {/* OAuth Buttons */}
         <div className="flex flex-col items-center gap-3 mb-4">
-          <button className="btn btn-outline-danger w-75 d-flex justify-content-center align-items-center gap-2 py-2">
+          <button
+            onClick={() => signIn("google", { callbackUrl: "/" })}
+            className="btn btn-outline-danger w-75 d-flex justify-content-center align-items-center gap-2 py-2"
+          >
             <svg xmlns="http://www.w3.org/2000/svg" className="w-7" viewBox="0 0 488 512">
               <path d="M488 261.8C488 403.3 391.1 504 248 504C110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"/>
             </svg>
             <span className="fw-semibold text-sm">Continue with Google</span>
           </button>
-          <button className="btn btn-outline-primary w-75 d-flex justify-content-center align-items-center gap-2 py-2">
+          <button
+            onClick={() => signIn("facebook", { callbackUrl: "/" })}
+            className="btn btn-outline-primary w-75 d-flex justify-content-center align-items-center gap-2 py-2"
+          >
             <svg xmlns="http://www.w3.org/2000/svg" className="w-5" viewBox="0 0 320 512">
               <path d="M80 299.3V512H196V299.3h86.5l18-97.8H196V166.9c0-51.7 20.3-71.5 72.7-71.5c16.3 0 29.4 .4 37 1.2V7.9C291.4 4 256.4 0 236.2 0C129.3 0 80 50.5 80 159.4v42.1H14v97.8H80z"/>
             </svg>
@@ -23,36 +75,67 @@ export default function SignupPage() {
 
         <div className="text-center text-muted mb-3 text-sm">or use your email</div>
 
-        <form className="space-y-3">
+        <form onSubmit={handleSubmit} className="space-y-3">
           <div>
             <label className="form-label text-sm fw-bold">Full Name</label>
-            <input type="text" name="name" className="form-control text-sm" required />
+            <input
+              type="text"
+              name="name"
+              className="form-control text-sm"
+              value={form.name}
+              onChange={handleChange}
+              required
+            />
           </div>
           <div>
             <label className="form-label text-sm fw-bold">Email Address</label>
-            <input type="email" name="email" className="form-control text-sm" required />
+            <input
+              type="email"
+              name="email"
+              className="form-control text-sm"
+              value={form.email}
+              onChange={handleChange}
+              required
+            />
           </div>
           <div>
             <label className="form-label text-sm fw-bold">Password</label>
-            <input type="password" name="password" className="form-control text-sm" required />
+            <input
+              type="password"
+              name="password"
+              className="form-control text-sm"
+              value={form.password}
+              onChange={handleChange}
+              required
+            />
           </div>
           <div>
             <label className="form-label text-sm fw-bold">Confirm Password</label>
-            <input type="password" name="confirmPassword" className="form-control text-sm" required />
+            <input
+              type="password"
+              name="confirmPassword"
+              className="form-control text-sm"
+              value={form.confirmPassword}
+              onChange={handleChange}
+              required
+            />
           </div>
 
+          {error && <p className="text-danger text-sm">{error}</p>}
+          {success && <p className="text-success text-sm">{success}</p>}
+
           <div className="d-grid mt-3">
-            <button type="submit" className="btn btn-success fw-bold text-sm">
-              Sign Up
+            <button type="submit" className="btn btn-success fw-bold text-sm" disabled={isPending}>
+              {isPending ? "Creating Account..." : "Sign Up"}
             </button>
           </div>
         </form>
 
         <p className="text-center mt-3 text-sm text-muted">
           Already have an account?{" "}
-          <a href="/login" className="text-primary fw-bold">
+          <Link href="/login" className="text-primary fw-bold">
             Log in
-          </a>
+          </Link>
         </p>
       </div>
     </main>
