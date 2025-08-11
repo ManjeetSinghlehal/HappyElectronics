@@ -14,11 +14,16 @@ export const authOptions = {
   callbacks: {
     // user object returned by the provider
     async signIn({ user, account, profile }) {
+
       try {
         // saving the user in the database
+        console.log("under try");
+
         const saveUserData = await saveUser(user, account.provider);
+        console.log(saveUserData);
+
         if (saveUserData) {
-          return true;
+          return user;
         }
       } catch (e) {
         console.error(e.message);
@@ -62,9 +67,7 @@ export const authOptions = {
       clientId: process.env.FACEBOOK_CLIENT_ID,
       clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
       authorization: {
-        params: {
-          prompt: "select_account",
-        },
+        params: { scope: "email public_profile" },
       },
     }),
     CredentialsProvider({
@@ -76,12 +79,12 @@ export const authOptions = {
       async authorize(credentials) {
         const { email, password } = credentials;
         console.log(email, password);
-        
-        const user = await login(email, password);
+
+        const user = await login(email, password); // adapt this
         console.log(user);
-        
+
         if (user.success) {
-          return user.user;
+          return user.user; // must be a plain object
         }
         return null;
       },

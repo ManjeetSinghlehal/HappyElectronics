@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState, useTransition } from "react";
 import { signIn } from "next-auth/react";
+import login from "../actions/login";
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {

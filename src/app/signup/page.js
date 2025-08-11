@@ -13,33 +13,50 @@ export default function SignupPage() {
     confirmPassword: "",
   });
 
-  const [error, setError] = useState("");
+  const [errors, setErrors] = useState({});
   const [success, setSuccess] = useState("");
   const [isPending, startTransition] = useTransition();
 
-  const handleChange = (e) =>
+  const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+    setErrors({ ...errors, [e.target.name]: "" }); // Clear error on change
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (form.password !== form.confirmPassword) {
-      setError("Passwords do not match.");
-      return;
-    }
 
     const data = new FormData();
     data.append("name", form.name);
     data.append("email", form.email);
     data.append("password", form.password);
+    data.append("confirmPassword", form.confirmPassword);
+
+    setSuccess("");
+    setErrors({});
 
     startTransition(async () => {
       const result = await signUp(data);
-      if (typeof result === "string") {
-        setError(result);
-        setSuccess("");
-      } else if (result?.success) {
-        setError("");
+      if (result?.success) {
         setSuccess(result.message);
+        setForm({
+          name: "",
+          email: "",
+          password: "",
+          confirmPassword: "",
+        });
+        setErrors({});
+      } else {
+        setSuccess("");
+        // Basic keyword detection for mapping message to field
+        const msg = result?.message || "Something went wrong.";
+        const field = ["name", "email", "password", "confirmPassword"].find((f) =>
+          msg.toLowerCase().includes(f)
+        );
+        if (field) {
+          setErrors({ [field]: msg });
+        } else {
+          setErrors({ general: msg });
+        }
       }
     });
   };
@@ -51,7 +68,6 @@ export default function SignupPage() {
           Create Your Account
         </h2>
 
-        {/* OAuth Buttons */}
         <div className="flex flex-col items-center gap-3 mb-4">
           <button
             onClick={() => signIn("google", { callbackUrl: "/" })}
@@ -86,6 +102,7 @@ export default function SignupPage() {
               onChange={handleChange}
               required
             />
+            {errors.name && <p className="text-danger text-sm mt-1">{errors.name}</p>}
           </div>
           <div>
             <label className="form-label text-sm fw-bold">Email Address</label>
@@ -97,6 +114,7 @@ export default function SignupPage() {
               onChange={handleChange}
               required
             />
+            {errors.email && <p className="text-danger text-sm mt-1">{errors.email}</p>}
           </div>
           <div>
             <label className="form-label text-sm fw-bold">Password</label>
@@ -108,6 +126,7 @@ export default function SignupPage() {
               onChange={handleChange}
               required
             />
+            {errors.password && <p className="text-danger text-sm mt-1">{errors.password}</p>}
           </div>
           <div>
             <label className="form-label text-sm fw-bold">Confirm Password</label>
@@ -119,10 +138,13 @@ export default function SignupPage() {
               onChange={handleChange}
               required
             />
+            {errors.confirmPassword && (
+              <p className="text-danger text-sm mt-1">{errors.confirmPassword}</p>
+            )}
           </div>
 
-          {error && <p className="text-danger text-sm">{error}</p>}
-          {success && <p className="text-success text-sm">{success}</p>}
+          {errors.general && <p className="text-danger text-sm mt-2">{errors.general}</p>}
+          {success && <p className="text-success text-sm mt-2">{success}</p>}
 
           <div className="d-grid mt-3">
             <button type="submit" className="btn btn-success fw-bold text-sm" disabled={isPending}>

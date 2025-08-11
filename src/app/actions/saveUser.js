@@ -5,11 +5,13 @@ import generateId from "./generateId";
 export const saveUser = async (session, provider) => {
 
     if (User) {
+        console.log("under if in saveUser");
+        console.log(session);
+        console.log(provider);
+        
         // saving user to the db if the session has value
         try {
-            if (session.email && provider) {
-                console.log(session);
-                
+            if (session.id && provider) {
                 const { id, name, email, image } = session;
                 const providerId = parseInt(id);
                 const userEmail = await User.findOne({ email: email });

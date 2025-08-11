@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 
 export default function Footer() {
@@ -7,7 +8,14 @@ export default function Footer() {
     <footer className="bg-black text-light py-4 mt-auto shadow-sm">
       <div className="container d-flex flex-column flex-md-row justify-content-between align-items-center">
         {/* Left Text */}
-        <div className="mb-3 mb-md-0 text-center text-md-start">
+        <div className="mb-3 mb-md-0 text-center text-md-start d-flex align-items-center">
+          <Image
+            src="/images/happy electronics.png"
+            alt="Happy Electronics Logo"
+            width={30}
+            height={30}
+            className="me-2"
+          />
           © {new Date().getFullYear()} Happy Electronics. All rights reserved.
         </div>
 

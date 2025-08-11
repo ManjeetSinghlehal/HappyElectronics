@@ -1,30 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
-import fetchProducts from "./actions/fetchProducts";
-
-const bestSellers = [
-  {
-    id: 1,
-    name: "iPhone 15 Pro",
-    price: 1299,
-    imageUrl: "/images/15-pro.png",
-  },
-  {
-    id: 2,
-    name: "Samsung Galaxy S24",
-    price: 1099,
-    imageUrl: "/images/s-24.png",
-  },
-  {
-    id: 3,
-    name: "MacBook Pro M3",
-    price: 2399,
-    imageUrl: "/images/pro-m3.png",
-  },
-];
+import fetchBestSeller from "./actions/fetchBestSeller";
 
 export default async function HomePage() {
-  const products = await fetchProducts();
+  const products = await fetchBestSeller();
   return (
     <main>
       {/* Hero Section */}
@@ -36,7 +15,7 @@ export default async function HomePage() {
           <p className="lead">
             Explore the latest mobiles, laptops, gadgets & accessories.
           </p>
-          <Link href="/mobiles" className="btn btn-light btn-md mt-3">
+          <Link href="/products" className="btn btn-light btn-md mt-3">
             Shop Now
           </Link>
         </div>
@@ -46,30 +25,34 @@ export default async function HomePage() {
       <section className="container my-5">
         <h2 className="mb-4">🔥 Best Sellers</h2>
         <div className="row g-4">
-          {products && products.length > 0 && products.map((product) => (
-            <div className="col-sm-6 col-md-4" key={product.id}>
-              <div className="card h-100 shadow-sm">
-                <Image
-                  src={product.imageUrl}
-                  alt={product.name}
-                  width={300}
-                  height={200}
-                  className="card-img-top object-fit-cover"
-                />
-                <div className="card-body d-flex flex-column">
-                  <h5 className="card-title">{product.name}</h5>
-                  <p className="card-text">${product.price}</p>
-                  <p className="card-text font-semibold italic">{product.category}</p>
-                  <Link
-                    href={`/products/${product.id}`}
-                    className="btn btn-primary mt-auto"
-                  >
-                    View Product
-                  </Link>
+          {products &&
+            products.length > 0 &&
+            products.map((product) => (
+              <div className="col-sm-6 col-md-4" key={product.id}>
+                <div className="card h-100 shadow-sm">
+                  <Image
+                    src={product.imageUrl}
+                    alt={product.name}
+                    width={300}
+                    height={200}
+                    className="card-img-top object-fit-cover"
+                  />
+                  <div className="card-body d-flex flex-column">
+                    <h5 className="card-title">{product.name}</h5>
+                    <p className="card-text">${product.price}</p>
+                    <p className="card-text font-semibold italic">
+                      {product.category}
+                    </p>
+                    <Link
+                      href={`/details/${product.id}`}
+                      className="btn btn-outline-primary mt-auto"
+                    >
+                      View Product
+                    </Link>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
         </div>
       </section>
 
